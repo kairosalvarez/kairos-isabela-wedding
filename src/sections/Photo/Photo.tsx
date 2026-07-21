@@ -1,73 +1,88 @@
 "use client";
 
-import Image from "next/image";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 
 import AnimatedSection from "@/components/motion/AnimatedSection";
-import { wedding } from "@/data/wedding";
+import GalleryGrid from "@/components/gallery/GalleryGrid";
+import GalleryLightbox from "@/components/gallery/GalleryLightbox";
+
+import { gallery } from "@/data/gallery";
 
 export default function Photo() {
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+
+  const handleClose = useCallback(() => {
+    setCurrentIndex(null);
+  }, []);
+
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((prev) => {
+      if (prev === null) return null;
+      return prev === 0 ? gallery.length - 1 : prev - 1;
+    });
+  }, []);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => {
+      if (prev === null) return null;
+      return prev === gallery.length - 1 ? 0 : prev + 1;
+    });
+  }, []);
+
   return (
     <AnimatedSection>
-      <section className="px-5 py-16 bg-[var(--background)]">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative overflow-hidden rounded-[2rem] border border-white/20 shadow-2xl shadow-black/20"
-        >
-          {/* Fotografía */}
-          <div className="relative aspect-[4/6] w-full">
-            <Image
-              src="/images/couple.jpg"
-              alt={`${wedding.couple.groom} e ${wedding.couple.bride}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 430px"
-              priority={false}
-            />
+      <section className="relative flex min-h-screen items-center overflow-hidden py-8">
+        {/* Fondo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/images/fondo%209.jpg')",
+          }}
+        />
 
-            {/* Overlay suave */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
 
-            {/* Borde interior */}
-            <div className="absolute inset-3 rounded-[1.7rem] border border-white/15" />
+        {/* Contenido */}
+        <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mb-8 flex w-full flex-col items-center text-center"
+          >
+            <h2
+              style={{
+                fontFamily: "var(--font-title)",
+              }}
+              className="text-5xl font-light tracking-wide text-white"
+            >
+              Galería
+            </h2>
 
-            {/* Texto inferior */}
-            <div className="absolute inset-x-0 bottom-12 z-10 flex flex-col items-center text-center px-6">
-              <h2
-                style={{
-                  fontFamily: "var(--font-title)",
-                  fontStyle: "italic",
-                }}
-                className="text-5xl md:text-6xl font-semibold leading-none tracking-wide text-white drop-shadow-lg"
-              >
-                {wedding.couple.groom}
-              </h2>
+            <div className="mt-4 mb-5 h-px w-20 bg-white/30" />
 
-              <span
-                style={{
-                  fontFamily: "var(--font-title)",
-                  fontStyle: "italic",
-                }}
-                className="my-3 text-4xl font-medium leading-none text-[#E8D3A8] opacity-95"
-              >
-                e
-              </span>
+            <p className="max-w-[290px] text-center text-sm leading-7 text-white/75">
+              Un recorrido por algunos de nuestros recuerdos y momentos más
+              especiales.
+            </p>
+          </motion.div>
 
-              <h2
-                style={{
-                  fontFamily: "var(--font-title)",
-                  fontStyle: "italic",
-                }}
-                className="text-5xl md:text-6xl font-semibold leading-none tracking-wide text-white drop-shadow-lg"
-              >
-                {wedding.couple.bride}
-              </h2>
-            </div>
-          </div>
-        </motion.div>
+          <GalleryGrid
+            images={gallery}
+            onSelect={setCurrentIndex}
+          />
+        </div>
+
+        <GalleryLightbox
+          images={gallery}
+          currentIndex={currentIndex}
+          onClose={handleClose}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+        />
       </section>
     </AnimatedSection>
   );
