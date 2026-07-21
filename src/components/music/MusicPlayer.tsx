@@ -31,9 +31,9 @@ export default function MusicPlayer() {
   return (
     <>
       <audio
-        ref={audioRef}
-        src="/music/boda.mp3"
-      />
+  ref={audioRef}
+  src="/music/nuestra-cancion.mp3"
+/>
 
       <motion.button
         onClick={toggleMusic}
